@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fff8ea">
+  <meta name="color-scheme" content="light">
+  <meta name="application-name" content="DOROX">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="DOROX">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/icon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/icon-180.png">
+  <link rel="stylesheet" href="./css/app.css">
+  <title>DOROX — Courses, stocks et budget</title>
+</head>
+<body>
+  <div id="offlineBanner" class="status-banner offline" hidden>Mode hors connexion : vos données restent disponibles sur cet appareil.</div>
+
+  <header class="app-header">
+    <div class="header-content">
+      <button class="brand-button" type="button" data-view-jump="dashboard" aria-label="Retour au tableau de bord">
+        <img src="./assets/icons/icon-192.png" alt="" width="42" height="42">
+        <span><strong>DOROX</strong><small>Courses, stocks et budget</small></span>
+      </button>
+      <div class="header-actions">
+        <button id="headerPhase" class="phase-pill" type="button" data-action="open-budget">Phase 1 · 400,00 €</button>
+        <button class="icon-button" type="button" data-action="open-settings" aria-label="Ouvrir les paramètres">⚙</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main" id="appMain">
+    <section class="view active" id="view-dashboard" data-view="dashboard">
+      <div class="view-heading">
+        <div><p class="eyebrow">Tableau de bord</p><h1>Votre mois en un coup d’œil</h1></div>
+      </div>
+
+      <div id="welcomeNotice"></div>
+      <div class="metric-grid">
+        <article class="metric-card"><span>Budget restant</span><strong id="metricRemaining">—</strong><small id="metricBudgetDetail">—</small></article>
+        <article class="metric-card"><span>Stock bas</span><strong id="metricLowStock">—</strong><small>produits à contrôler</small></article>
+        <article class="metric-card"><span>À examiner</span><strong id="metricExamine">—</strong><small>pour la préparation</small></article>
+        <article class="metric-card"><span>Inventaires</span><strong id="metricCycles">—</strong><small>clôturés ce mois</small></article>
+      </div>
+
+      <article class="panel" id="budgetPanel"></article>
+      <article class="panel" id="cyclePanel"></article>
+      <article class="panel pwa-panel" id="pwaPanel"></article>
+    </section>
+
+    <section class="view" id="view-inventory" data-view="inventory">
+      <div class="view-heading with-action">
+        <div><p class="eyebrow">Inventaire</p><h1>Vos produits</h1><p>Actualisez le stock réel avant de préparer les courses.</p></div>
+        <button class="button primary compact" type="button" data-action="add-product">+ Produit</button>
+      </div>
+
+      <div class="filter-panel">
+        <label class="search-field"><span class="sr-only">Rechercher</span><input id="inventorySearch" type="search" placeholder="Rechercher un produit…" autocomplete="off"></label>
+        <select id="inventoryCategory" aria-label="Filtrer par catégorie"><option value="">Toutes les catégories</option></select>
+        <select id="inventoryStock" aria-label="Filtrer par stock">
+          <option value="">Tous les stocks</option><option>Plein</option><option>Moyen</option><option>Bas</option><option>Épuisé</option>
+        </select>
+        <select id="inventoryLevel" aria-label="Filtrer par niveau">
+          <option value="">Tous les niveaux</option><option value="1">1 · Socle</option><option value="2">2 · Stratégique</option><option value="3">3 · Rotation</option><option value="4">4 · Confort</option>
+        </select>
+        <select id="inventoryFlex" aria-label="Filtrer par souplesse">
+          <option value="">Toutes les souplesses</option><option>Faible</option><option>Moyenne</option><option>Élevée</option><option>Très élevée</option>
+        </select>
+      </div>
+      <div id="inventoryCount" class="result-count"></div>
+      <div id="inventoryList"></div>
+    </section>
+
+    <section class="view" id="view-prepare" data-view="prepare">
+      <div class="view-heading">
+        <div><p class="eyebrow">Préparation</p><h1>Arbitrer la liste proposée</h1><p>DOROX recommande. Vous validez, modifiez, reportez ou écartez.</p></div>
+      </div>
+      <div id="prepareSummary"></div>
+      <div id="prepareList"></div>
+    </section>
+
+    <section class="view" id="view-shopping" data-view="shopping">
+      <div class="view-heading">
+        <div><p class="eyebrow">Mode Courses</p><h1>Acheter sans perdre le budget de vue</h1><p>Cochez les achats et remplacez le prix estimé par le prix réel.</p></div>
+      </div>
+      <div id="shoppingSummary"></div>
+      <div id="shoppingList"></div>
+    </section>
+
+    <section class="view" id="view-history" data-view="history">
+      <div class="view-heading with-action">
+        <div><p class="eyebrow">Historique</p><h1>Inventaires clôturés</h1><p>Achats, produits non trouvés et décisions d’arbitrage restent traçables.</p></div>
+        <button class="button secondary compact" type="button" data-action="export-data">Exporter</button>
+      </div>
+      <div id="historyList"></div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Navigation principale">
+    <button class="nav-button active" type="button" data-view-target="dashboard"><span aria-hidden="true">⌂</span>Accueil</button>
+    <button class="nav-button" type="button" data-view-target="inventory"><span aria-hidden="true">▦</span>Inventaire</button>
+    <button class="nav-button" type="button" data-view-target="prepare"><span aria-hidden="true">☑</span>Préparer</button>
+    <button class="nav-button" type="button" data-view-target="shopping"><span aria-hidden="true">🛒</span>Courses</button>
+    <button class="nav-button" type="button" data-view-target="history"><span aria-hidden="true">↺</span>Historique</button>
+  </nav>
+
+  <dialog id="budgetDialog">
+    <form class="dialog-card" id="budgetForm" method="dialog">
+      <div class="dialog-heading"><div><p class="eyebrow">Budget</p><h2>Paramètres du mois</h2></div><button class="dialog-close" type="button" data-close-dialog="budgetDialog" aria-label="Fermer">×</button></div>
+      <p class="dialog-intro">Le budget reste modifiable à tout moment. Aucun produit ou achat enregistré ne sera supprimé automatiquement.</p>
+      <div class="form-grid">
+        <label>Mois suivi<input id="budgetMonth" type="month" required></label>
+        <label>Phase actuelle<select id="budgetPhase"><option value="1">Phase 1</option><option value="2">Phase 2</option><option value="3">Phase 3</option><option value="4">Phase 4</option></select></label>
+        <label>Budget mensuel habituel (€)<input id="budgetBase" type="number" min="0" step="1" required></label>
+        <label>Budget exceptionnel du mois (€)<input id="budgetAdjusted" type="number" min="0" step="1" placeholder="Laisser vide si aucun"></label>
+        <label>Réserve de phase 4 (€)<input id="budgetReserve" type="number" min="15" max="30" step="1" required><small>Entre 15 € et 30 €.</small></label>
+        <label>Besoin d’eau hebdomadaire (L)<input id="budgetWater" type="number" min="0" step="1" required></label>
+        <label class="checkbox-row full"><input id="budgetUseReserve" type="checkbox"><span>Autoriser l’utilisation de la réserve pour le cycle actuel.</span></label>
+      </div>
+      <div class="dialog-actions"><button class="button secondary" type="button" data-close-dialog="budgetDialog">Annuler</button><button class="button primary" type="submit">Enregistrer</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="productDialog">
+    <form class="dialog-card" id="productForm" method="dialog">
+      <div class="dialog-heading"><div><p class="eyebrow">Inventaire</p><h2 id="productDialogTitle">Ajouter un produit</h2></div><button class="dialog-close" type="button" data-close-dialog="productDialog" aria-label="Fermer">×</button></div>
+      <input id="productId" type="hidden">
+      <div class="form-grid">
+        <label class="full">Nom du produit<input id="productName" required></label>
+        <label>Catégorie<input id="productCategory" list="categorySuggestions" required><datalist id="categorySuggestions"></datalist></label>
+        <label>Canal d’achat<input id="productChannel" list="channelSuggestions"><datalist id="channelSuggestions"><option value="Supermarché"><option value="Drive"><option value="Marché"><option value="Boulangerie"><option value="Autre"></datalist></label>
+        <label>Quantité de référence<input id="productQuantity"></label>
+        <label>Fréquence d’achat<input id="productFrequency" placeholder="Hebdomadaire, bi-mensuelle…"></label>
+        <label>Seuil d’alerte<input id="productThreshold"></label>
+        <label>Prix estimé (€)<input id="productPrice" type="number" min="0" step="0.01"></label>
+        <label>Dernier achat<input id="productLastPurchase" type="date"></label>
+        <label>Niveau<select id="productLevel"><option value="1">1 · Socle</option><option value="2">2 · Stratégique</option><option value="3">3 · Rotation</option><option value="4">4 · Confort</option></select></label>
+        <label>Souplesse<select id="productFlex"><option>Faible</option><option>Moyenne</option><option>Élevée</option><option>Très élevée</option></select></label>
+        <label>Stock actuel<select id="productStock"><option>Plein</option><option>Moyen</option><option>Bas</option><option>Épuisé</option></select></label>
+        <label class="checkbox-row full"><input id="productManual" type="checkbox"><span>Ajouter manuellement à la prochaine préparation.</span></label>
+      </div>
+      <div class="dialog-actions"><button class="button secondary" type="button" data-close-dialog="productDialog">Annuler</button><button class="button primary" type="submit">Enregistrer</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="itemDialog">
+    <form class="dialog-card" id="itemForm" method="dialog">
+      <div class="dialog-heading"><div><p class="eyebrow">Préparation</p><h2>Modifier la proposition</h2></div><button class="dialog-close" type="button" data-close-dialog="itemDialog" aria-label="Fermer">×</button></div>
+      <p class="dialog-intro" id="itemDialogName"></p>
+      <input id="itemProductId" type="hidden">
+      <div class="form-grid">
+        <label>Quantité prévue<input id="itemQuantity"></label>
+        <label>Prix estimé (€)<input id="itemEstimatedPrice" type="number" min="0" step="0.01"></label>
+      </div>
+      <div class="dialog-actions"><button class="button secondary" type="button" data-close-dialog="itemDialog">Annuler</button><button class="button primary" type="submit">Valider la modification</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="closeCycleDialog">
+    <form class="dialog-card" id="closeCycleForm" method="dialog">
+      <div class="dialog-heading"><div><p class="eyebrow">Clôture</p><h2>Clôturer cet inventaire</h2></div><button class="dialog-close" type="button" data-close-dialog="closeCycleDialog" aria-label="Fermer">×</button></div>
+      <p class="dialog-intro" id="closeCycleSummary"></p>
+      <div class="notice success"><strong>Mise à jour explicite</strong><span>Les produits achetés passeront à « Plein ». Leur date et leur prix réel seront enregistrés. Les produits non trouvés resteront à acheter.</span></div>
+      <label class="checkbox-row"><input id="closeAdvancePhase" type="checkbox"><span>Passer à la phase suivante après la clôture.</span></label>
+      <div class="dialog-actions"><button class="button secondary" type="button" data-close-dialog="closeCycleDialog">Annuler</button><button class="button success" type="submit">Confirmer la clôture</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="settingsDialog">
+    <div class="dialog-card">
+      <div class="dialog-heading"><div><p class="eyebrow">DOROX</p><h2>Paramètres et sauvegarde</h2></div><button class="dialog-close" type="button" data-close-dialog="settingsDialog" aria-label="Fermer">×</button></div>
+      <section class="settings-section">
+        <h3>Application</h3>
+        <div class="settings-row"><span>Installation</span><button class="button secondary compact" type="button" data-action="install-app">Installer / Aide</button></div>
+        <div class="settings-row"><span>Budget et phase</span><button class="button secondary compact" type="button" data-action="open-budget">Modifier</button></div>
+      </section>
+      <section class="settings-section">
+        <h3>Données locales</h3>
+        <p>Les données sont conservées sur cet appareil. Un export régulier protège contre une suppression des données Safari.</p>
+        <div class="button-row"><button class="button secondary" type="button" data-action="export-data">Exporter</button><button class="button secondary" type="button" data-action="trigger-import">Importer</button></div>
+        <input id="importInput" type="file" accept="application/json,.json" hidden>
+      </section>
+      <section class="settings-section about-section">
+        <h3>À propos</h3>
+        <button id="versionTap" class="version-button" type="button"><strong>DOROX <span id="aboutVersion"></span></strong><span id="aboutBuild"></span></button>
+        <p id="storageModeText"></p>
+      </section>
+      <section id="developerPanel" class="settings-section developer-panel" hidden>
+        <h3>Mode développeur</h3>
+        <div class="developer-grid">
+          <div><span>Produits</span><strong id="devProducts">—</strong></div>
+          <div><span>Historique</span><strong id="devHistory">—</strong></div>
+          <div><span>Stockage</span><strong id="devStorage">—</strong></div>
+          <div><span>Schéma</span><strong id="devSchema">—</strong></div>
+        </div>
+        <button class="button danger full-width" type="button" data-action="reset-app">Réinitialiser toutes les données</button>
+      </section>
+    </div>
+  </dialog>
+
+  <dialog id="installDialog">
+    <div class="dialog-card">
+      <div class="dialog-heading"><div><p class="eyebrow">Installation</p><h2>Installer DOROX</h2></div><button class="dialog-close" type="button" data-close-dialog="installDialog" aria-label="Fermer">×</button></div>
+      <div id="installContent"></div>
+      <div class="dialog-actions"><button class="button primary" type="button" data-close-dialog="installDialog">J’ai compris</button></div>
+    </div>
+  </dialog>
+
+  <div id="updateBanner" class="update-banner" hidden>
+    <span>Une nouvelle version de DOROX est prête.</span>
+    <button class="button light compact" id="applyUpdateButton" type="button">Mettre à jour</button>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="fatalError" class="fatal-error" hidden></div>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

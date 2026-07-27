@@ -1,0 +1,112 @@
+{
+  "id": "./",
+  "name": "DOROX — Courses, stocks et budget",
+  "short_name": "DOROX",
+  "description": "Gestionnaire familial de courses, de stocks et de budget, utilisable hors ligne et sans compte.",
+  "lang": "fr-FR",
+  "dir": "ltr",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "portrait-primary",
+  "background_color": "#fff8ea",
+  "theme_color": "#fff8ea",
+  "categories": [
+    "shopping",
+    "finance",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "./assets/icons/icon-32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./assets/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Mettre à jour l’inventaire",
+      "short_name": "Inventaire",
+      "url": "./?view=inventory",
+      "icons": [
+        {
+          "src": "./assets/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Préparer les courses",
+      "short_name": "Préparer",
+      "url": "./?view=prepare",
+      "icons": [
+        {
+          "src": "./assets/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Ouvrir le mode Courses",
+      "short_name": "Courses",
+      "url": "./?view=shopping",
+      "icons": [
+        {
+          "src": "./assets/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./assets/screenshots/dashboard-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tableau de bord du budget et des stocks"
+    },
+    {
+      "src": "./assets/screenshots/preparation-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Arbitrage de la liste de courses proposée"
+    }
+  ]
+}

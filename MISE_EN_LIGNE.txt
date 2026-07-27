@@ -1,0 +1,16 @@
+DOROX V1 OFFICIELLE — MISE EN LIGNE
+
+1. Décompresser l’archive.
+2. Ouvrir le dossier DOROX_V1_OFFICIELLE.
+3. Sélectionner tout son contenu, et non le dossier extérieur.
+4. Dans GitHub : Add file > Upload files.
+5. Déposer tous les fichiers et dossiers à la racine du dépôt.
+6. Commit : Publication de DOROX V1 officielle 1.0.0
+7. Attendre quelques minutes.
+8. Ouvrir : https://dorox-app.github.io/dorox-app/
+9. Vérifier :
+   https://dorox-app.github.io/dorox-app/manifest.webmanifest
+   https://dorox-app.github.io/dorox-app/sw.js
+10. Sur iPhone, ouvrir l’adresse dans Safari puis Partager > Sur l’écran d’accueil.
+
+Le dépôt doit afficher directement index.html, manifest.webmanifest et sw.js.
