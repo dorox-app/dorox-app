@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fff8e9">
+<title>DOROX — Courses, stocks et budget</title>
+<style>
+:root{
+  --bg:#fff8e9;--card:#fffdf8;--ink:#4b3329;--muted:#76645c;--line:#eadccf;
+  --green:#7fa27c;--green-soft:#e7f1e4;--orange:#e98f4c;--orange-soft:#fff0df;
+  --pink:#c84f73;--pink-soft:#fbe6ed;--danger:#a53b3b;--danger-soft:#fff0f0;
+  --shadow:0 5px 18px rgba(70,40,20,.07);--radius:16px
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+header{position:sticky;top:0;z-index:20;background:rgba(255,248,233,.96);backdrop-filter:blur(9px);border-bottom:1px solid var(--line)}
+.header-inner{max-width:1040px;margin:auto;padding:14px 16px 11px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand h1{font-size:1.25rem;margin:0}.brand p{font-size:.78rem;color:var(--muted);margin:3px 0 0}
+.phase-pill{white-space:nowrap;background:var(--pink-soft);color:#84344f;border-radius:999px;padding:7px 10px;font-weight:750;font-size:.78rem}
+main{max-width:1040px;margin:auto;padding:15px 14px 100px}
+.view{display:none}.view.active{display:block}
+h2{font-size:1.2rem;margin:4px 0 5px}.lead{color:var(--muted);margin:0 0 14px;line-height:1.45;font-size:.91rem}
+.grid-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:12px 0}
+.metric{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:13px;box-shadow:var(--shadow)}
+.metric strong{display:block;font-size:1.22rem;margin-top:3px}.metric span{font-size:.73rem;color:var(--muted)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:15px;box-shadow:var(--shadow);margin-bottom:12px}
+.panel h3{font-size:1rem;margin:0 0 9px}.panel-title{display:flex;justify-content:space-between;align-items:start;gap:10px}
+.budget-row{display:flex;justify-content:space-between;gap:12px;align-items:end}.budget-big{font-size:1.65rem;font-weight:800}.muted{color:var(--muted)}
+.progress{height:10px;background:#f2e7dc;border-radius:999px;overflow:hidden;margin:12px 0 6px}.progress>span{display:block;height:100%;background:var(--pink);width:0;transition:.25s}
+.small{font-size:.78rem}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{border:0;border-radius:12px;padding:10px 13px;font-weight:750}
+.btn-primary{background:var(--pink);color:white}.btn-secondary{background:white;color:var(--ink);border:1px solid var(--line)}
+.btn-soft{background:var(--pink-soft);color:#84344f}.btn-green{background:var(--green);color:white}.btn-danger{background:var(--danger-soft);color:var(--danger);border:1px solid #efcaca}
+.btn-small{padding:8px 10px;font-size:.79rem}.btn-link{padding:4px 0;background:transparent;color:var(--pink);border:0;font-weight:750}
+.toolbar{display:grid;grid-template-columns:2fr repeat(3,1fr);gap:8px;margin:12px 0}
+input,select{width:100%;border:1px solid var(--line);border-radius:12px;background:white;color:var(--ink);padding:10px 11px}
+input[type="checkbox"]{width:auto}.section-title{font-size:.95rem;margin:19px 2px 8px}
+.product-card,.decision-card,.course-card,.history-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:13px;margin-bottom:9px;box-shadow:var(--shadow)}
+.card-head{display:flex;justify-content:space-between;gap:12px;align-items:start}.card-head h3{font-size:1rem;margin:0}.price{font-weight:800;white-space:nowrap}
+.sub{font-size:.81rem;color:var(--muted);margin-top:4px;line-height:1.4}.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.badge{font-size:.7rem;padding:5px 8px;border-radius:999px;background:#f4ece6}.stock-Plein{background:#e5f2e3;color:#315e36}.stock-Moyen{background:#fff1c8;color:#785b00}.stock-Bas{background:#ffe0ce;color:#8a3d12}.stock-Épuisé{background:#f8d8dc;color:#8a2030}
+.badge-status{background:var(--pink-soft);color:#84344f}.badge-ok{background:var(--green-soft);color:#315e36}.badge-warn{background:var(--orange-soft);color:#8a3d12}
+.empty{text-align:center;padding:36px 16px;color:var(--muted);background:var(--card);border:1px dashed var(--line);border-radius:var(--radius)}
+.callout{background:var(--orange-soft);border:1px solid #efd1ae;border-radius:14px;padding:12px;margin:12px 0;line-height:1.45}.callout strong{display:block;margin-bottom:3px}
+.callout.good{background:var(--green-soft);border-color:#cce0c9}.callout.pink{background:var(--pink-soft);border-color:#efcbd7}
+.decision-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}.why{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);font-size:.8rem;color:var(--muted)}
+.why[hidden]{display:none}.why ul{margin:5px 0 0;padding-left:18px}.why li{margin:3px 0}
+.filter-chips{display:flex;gap:7px;overflow:auto;padding:2px 0 9px}.chip{white-space:nowrap;border:1px solid var(--line);background:white;color:var(--ink);border-radius:999px;padding:8px 11px;font-weight:700;font-size:.78rem}.chip.active{background:var(--pink);color:white;border-color:var(--pink)}
+.course-line{display:grid;grid-template-columns:auto 1fr 120px;gap:10px;align-items:center}.course-check{width:23px;height:23px}.course-card.done{opacity:.72;background:#f7f7f2}.course-card.not-found{background:var(--danger-soft)}
+.course-actions{display:flex;gap:8px;align-items:center;margin-top:10px}.price-input{max-width:140px}
+.history-card summary{cursor:pointer;font-weight:750;list-style:none}.history-card summary::-webkit-details-marker{display:none}.history-meta{display:flex;justify-content:space-between;gap:10px;margin-top:5px;color:var(--muted);font-size:.8rem}.history-items{margin:11px 0 0;padding-left:18px;font-size:.82rem}.history-items li{margin:5px 0}
+.bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(255,253,248,.98);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:6px max(6px,env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left))}
+.nav-btn{background:transparent;border:0;color:var(--muted);padding:7px 3px;font-size:.68rem;font-weight:700}.nav-btn span{display:block;font-size:1.15rem;margin-bottom:2px}.nav-btn.active{color:var(--pink)}
+dialog{border:0;border-radius:20px;padding:0;max-width:650px;width:calc(100% - 24px);box-shadow:0 24px 70px rgba(0,0,0,.25)}dialog::backdrop{background:rgba(46,31,25,.46)}
+.modal{padding:18px}.modal h2{margin:0 0 5px}.modal-intro{color:var(--muted);font-size:.82rem;line-height:1.4;margin:0 0 14px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.full{grid-column:1/-1}label{display:block;font-size:.79rem;color:var(--muted)}label input,label select{margin-top:5px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:16px}.help{font-size:.7rem;color:var(--muted);margin-top:4px;line-height:1.35}.check-row{display:flex;gap:9px;align-items:start;color:var(--ink);font-size:.85rem}.check-row input{margin-top:2px}
+.toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:#3d2c25;color:#fff;padding:10px 14px;border-radius:999px;opacity:0;pointer-events:none;transition:.2s;z-index:50;font-size:.82rem}.toast.show{opacity:1}
+hr{border:0;border-top:1px solid var(--line);margin:14px 0}
+@media(max-width:760px){.grid-metrics{grid-template-columns:repeat(2,1fr)}.toolbar,.form-grid{grid-template-columns:1fr}.course-line{grid-template-columns:auto 1fr}.course-line .price-input{grid-column:2}.header-inner{padding-left:12px;padding-right:12px}.brand p{display:none}.panel{padding:13px}}
+@media(min-width:900px){.bottom-nav{left:50%;transform:translateX(-50%);max-width:700px;border:1px solid var(--line);border-bottom:0;border-radius:17px 17px 0 0}.nav-btn{font-size:.74rem}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="brand"><h1>DOROX</h1><p>Courses, stocks et budget familial · V1</p></div>
+    <button class="phase-pill" id="headerBudget" type="button">Phase 1 · 400 €</button>
+  </div>
+</header>
+<main>
+  <section class="view active" id="view-dashboard">
+    <h2>Tableau de bord</h2>
+    <p class="lead">L’essentiel du mois, sans surcharge.</p>
+    <div class="panel" id="budgetPanel"></div>
+    <div class="grid-metrics">
+      <div class="metric"><span>Stock bas ou épuisé</span><strong id="dashLow">0</strong></div>
+      <div class="metric"><span>À examiner</span><strong id="dashExamine">0</strong></div>
+      <div class="metric"><span>À surveiller</span><strong id="dashMonitor">0</strong></div>
+      <div class="metric"><span>Courses enregistrées</span><strong id="dashCycles">0</strong></div>
+    </div>
+    <div class="panel" id="currentCyclePanel"></div>
+    <div class="panel">
+      <div class="panel-title"><div><h3>Données et sauvegarde</h3><div class="sub">Les données restent sur cet appareil. Exportez régulièrement une copie.</div></div></div>
+      <div class="actions">
+        <button class="btn btn-secondary" id="exportBtn" type="button">Exporter</button>
+        <button class="btn btn-secondary" id="importBtn" type="button">Restaurer</button>
+        <button class="btn btn-danger" id="resetBtn" type="button">Réinitialiser la V1</button>
+        <input type="file" id="fileInput" accept="application/json" hidden>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-inventory">
+    <h2>Inventaire</h2>
+    <p class="lead">Mettez à jour le stock réel. Le moteur utilise ces informations pour préparer la prochaine liste.</p>
+    <div class="actions"><button class="btn btn-primary" id="addProductBtn" type="button">＋ Ajouter un produit</button></div>
+    <div class="toolbar">
+      <input id="searchInventory" type="search" placeholder="Rechercher un produit…">
+      <select id="filterCategory"><option value="">Toutes les catégories</option></select>
+      <select id="filterStock"><option value="">Tous les stocks</option><option>Plein</option><option>Moyen</option><option>Bas</option><option>Épuisé</option></select>
+      <select id="filterLevel"><option value="">Tous les niveaux</option><option value="1">Socle</option><option value="2">Stratégique</option><option value="3">Rotation</option><option value="4">Confort</option></select>
+    </div>
+    <div id="inventoryList"></div>
+  </section>
+
+  <section class="view" id="view-prepare">
+    <h2>Préparation</h2>
+    <p class="lead">DOROX propose et classe. Vous validez, modifiez, reportez ou écartez.</p>
+    <div id="prepareSummary"></div>
+    <div class="filter-chips" id="decisionFilters">
+      <button class="chip active" data-decision="all" type="button">Tous</button>
+      <button class="chip" data-decision="pending" type="button">À examiner</button>
+      <button class="chip" data-decision="validated" type="button">Validés</button>
+      <button class="chip" data-decision="postponed" type="button">Reportés</button>
+      <button class="chip" data-decision="excluded" type="button">Écartés</button>
+    </div>
+    <div id="proposalList"></div>
+  </section>
+
+  <section class="view" id="view-shopping">
+    <h2>Mode Courses</h2>
+    <p class="lead">Cochez les achats et saisissez le prix réellement payé.</p>
+    <div id="shoppingSummary"></div>
+    <div id="shoppingList"></div>
+  </section>
+
+  <section class="view" id="view-history">
+    <h2>Historique</h2>
+    <p class="lead">Les inventaires clôturés et les dépenses réellement enregistrées.</p>
+    <div id="historyList"></div>
+  </section>
+</main>
+
+<nav class="bottom-nav" aria-label="Navigation principale">
+  <button class="nav-btn active" data-view="dashboard" type="button"><span>⌂</span>Accueil</button>
+  <button class="nav-btn" data-view="inventory" type="button"><span>▦</span>Inventaire</button>
+  <button class="nav-btn" data-view="prepare" type="button"><span>☑</span>Préparer</button>
+  <button class="nav-btn" data-view="shopping" type="button"><span>🛒</span>Courses</button>
+  <button class="nav-btn" data-view="history" type="button"><span>↺</span>Historique</button>
+</nav>
+
+<dialog id="budgetDialog">
+  <form class="modal" id="budgetForm" method="dialog">
+    <h2>Budget du mois</h2>
+    <p class="modal-intro">Le budget peut être modifié à tout moment. Les dépenses déjà enregistrées ne seront jamais supprimées.</p>
+    <div class="form-grid">
+      <label>Mois suivi<input id="activeMonth" type="month" required></label>
+      <label>Phase actuelle<select id="currentPhase"><option value="1">Phase 1</option><option value="2">Phase 2</option><option value="3">Phase 3</option><option value="4">Phase 4</option></select></label>
+      <label>Budget habituel (€)<input id="baseBudget" type="number" min="0" step="1" required></label>
+      <label>Budget ajusté du mois (€)<input id="adjustedBudget" type="number" min="0" step="1" placeholder="Laisser vide pour le budget habituel"></label>
+      <label>Réserve phase 4 (€)<input id="reserveBudget" type="number" min="15" max="30" step="1" required><div class="help">Valeur conseillée : 15 à 30 €.</div></label>
+      <label class="full check-row"><input id="useReserve" type="checkbox">Utiliser la réserve pour les achats actuels.</label>
+    </div>
+    <div class="modal-actions"><button class="btn btn-secondary" id="cancelBudget" type="button">Annuler</button><button class="btn btn-primary" type="submit">Enregistrer</button></div>
+  </form>
+</dialog>
+
+<dialog id="productDialog">
+  <form class="modal" id="productForm" method="dialog">
+    <h2 id="productFormTitle">Produit</h2>
+    <p class="modal-intro">Le niveau et la souplesse alimentent le moteur d’arbitrage, mais restent simples à modifier.</p>
+    <input id="productId" type="hidden">
+    <div class="form-grid">
+      <label class="full">Nom<input id="productName" required></label>
+      <label>Catégorie<input id="productCategory" required list="categoryList"><datalist id="categoryList"></datalist></label>
+      <label>Stock<select id="productStock"><option>Plein</option><option>Moyen</option><option>Bas</option><option>Épuisé</option></select></label>
+      <label>Quantité de référence<input id="productQuantity"></label>
+      <label>Fréquence d’achat<input id="productFrequency"></label>
+      <label>Seuil d’alerte<input id="productThreshold"></label>
+      <label>Canal d’achat<input id="productChannel" list="channelList"><datalist id="channelList"><option value="Supermarché"><option value="Drive"><option value="Marché"><option value="Boulangerie"></datalist></label>
+      <label>Prix estimé (€)<input id="productPrice" type="number" min="0" step="0.01"></label>
+      <label>Dernier achat<input id="productLastBuy" type="date"></label>
+      <label>Niveau<select id="productLevel"><option value="1">1 · Socle</option><option value="2">2 · Stratégique</option><option value="3">3 · Rotation</option><option value="4">4 · Confort</option></select></label>
+      <label>Souplesse<select id="productFlex"><option>Faible</option><option>Moyenne</option><option>Élevée</option><option>Très élevée</option></select></label>
+      <label class="full check-row"><input id="productManualBuy" type="checkbox">Ajouter manuellement à la prochaine préparation.</label>
+    </div>
+    <div class="modal-actions"><button class="btn btn-secondary" id="cancelProduct" type="button">Annuler</button><button class="btn btn-primary" type="submit">Enregistrer</button></div>
+  </form>
+</dialog>
+
+<dialog id="itemDialog">
+  <form class="modal" id="itemForm" method="dialog">
+    <h2>Modifier la proposition</h2>
+    <p class="modal-intro" id="itemDialogName"></p>
+    <input id="itemProductId" type="hidden">
+    <div class="form-grid">
+      <label>Quantité prévue<input id="itemQuantity"></label>
+      <label>Prix estimé (€)<input id="itemPrice" type="number" min="0" step="0.01"></label>
+    </div>
+    <div class="modal-actions"><button class="btn btn-secondary" id="cancelItem" type="button">Annuler</button><button class="btn btn-primary" type="submit">Valider la modification</button></div>
+  </form>
+</dialog>
+
+<dialog id="closeDialog">
+  <form class="modal" id="closeForm" method="dialog">
+    <h2>Clôturer cet inventaire</h2>
+    <p class="modal-intro" id="closeSummary"></p>
+    <div class="callout good"><strong>Mise à jour explicite</strong>Les produits cochés comme achetés passeront à « Plein ». Leur date et leur prix réel seront enregistrés. Les produits non trouvés resteront à acheter.</div>
+    <label class="check-row"><input id="advancePhase" type="checkbox" checked>Passer à la phase suivante après la clôture.</label>
+    <div class="modal-actions"><button class="btn btn-secondary" id="cancelClose" type="button">Annuler</button><button class="btn btn-green" type="submit">Confirmer la clôture</button></div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const LEVEL_LABELS={1:'Socle',2:'Stratégique',3:'Rotation',4:'Confort'};
+const FLEX_RANK={'Faible':1,'Moyenne':2,'Élevée':3,'Très élevée':4};
+const INITIAL_DATA=[{"id":"p1","categorie":"Petit-déjeuner","nom":"Flocons d’avoine","quantite":"1 kg","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Plein","aAcheter":false,"dernierAchat":"2026-06-19","canal":"Supermarché","prix":7.0,"createdAt":"","updatedAt":""},{"id":"p2","categorie":"Petit-déjeuner","nom":"Muesli croustillant ou Pétales de mais","quantite":"1 kg","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Bas","aAcheter":true,"dernierAchat":"2026-07-07","canal":"Supermarché","prix":7.0,"createdAt":"","updatedAt":""},{"id":"p3","categorie":"Petit-déjeuner","nom":"Craquottes / Crackers","quantite":"2 paquets","frequence":"Bi-mensuelle","seuil":"1 paquet","niveau":1,"niveauLibelle":"Socle","souplesse":"Faible","stock":"Moyen","aAcheter":false,"dernierAchat":"2026-07-07","canal":"Supermarché","prix":4.0,"createdAt":"","updatedAt":""},{"id":"p4","categorie":"Petit-déjeuner","nom":"Pain","quantite":"3–4 pains","frequence":"Hebdomadaire","seuil":"1 pain","niveau":1,"niveauLibelle":"Socle","souplesse":"Faible","stock":"Plein","aAcheter":false,"dernierAchat":"","canal":"Boulangerie","prix":1.2,"createdAt":"","updatedAt":""},{"id":"p5","categorie":"Petit-déjeuner","nom":"Miel","quantite":"1 pot","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Bas","aAcheter":true,"dernierAchat":"2026-06-19","canal":"Supermarché","prix":18.0,"createdAt":"","updatedAt":""},{"id":"p6","categorie":"Petit-déjeuner","nom":"Sucre","quantite":"1 kg","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Faible","stock":"Plein","aAcheter":false,"dernierAchat":"2026-07-13","canal":"Supermarché","prix":2.5,"createdAt":"","updatedAt":""},{"id":"p7","categorie":"Petit-déjeuner","nom":"Lait végétal (avoine/riz)","quantite":"6 L","frequence":"Bi-mensuelle","seuil":"2 L","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Faible","stock":"Moyen","aAcheter":false,"dernierAchat":"2026-06-19","canal":"Supermarché","prix":15.0,"createdAt":"","updatedAt":""},{"id":"p8","categorie":"Petit-déjeuner","nom":"Lait concentré sucré","quantite":"1 kg","frequence":"Hebdomadaire","seuil":"150 g","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Moyen","aAcheter":false,"dernierAchat":"2026-07-07","canal":"Supermarché","prix":6.5,"createdAt":"","updatedAt":""},{"id":"p9","categorie":"Petit-déjeuner","nom":"Fromage à tartiner / Gruyère","quantite":"500 g","frequence":"Hebdomadaire","seuil":"150 g","niveau":1,"niveauLibelle":"Socle","souplesse":"Faible","stock":"Bas","aAcheter":true,"dernierAchat":"2026-07-01","canal":"Supermarché","prix":3.0,"createdAt":"","updatedAt":""},{"id":"p10","categorie":"Petit-déjeuner","nom":"Beurre","quantite":"500 g","frequence":"Hebdomadaire","seuil":"150 g","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Faible","stock":"Plein","aAcheter":false,"dernierAchat":"2026-06-06","canal":"Supermarché","prix":3.0,"createdAt":"","updatedAt":""},{"id":"p11","categorie":"Petit-déjeuner","nom":"Yahourt velouté","quantite":"1 paquet","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":1,"niveauLibelle":"Socle","souplesse":"Faible","stock":"Bas","aAcheter":true,"dernierAchat":"2026-07-01","canal":"Supermarché","prix":8.5,"createdAt":"","updatedAt":""},{"id":"p12","categorie":"Petit-déjeuner","nom":"Yahourt au soja","quantite":"1 paquet","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":1,"niveauLibelle":"Socle","souplesse":"Faible","stock":"Bas","aAcheter":true,"dernierAchat":"2026-07-01","canal":"Supermarché","prix":4.5,"createdAt":"","updatedAt":""},{"id":"p13","categorie":"Petit-déjeuner","nom":"Crème de maïs","quantite":"500 g","frequence":"Hebdomadaire","seuil":"150 g","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Plein","aAcheter":false,"dernierAchat":"2026-05-30","canal":"Supermarché","prix":2.5,"createdAt":"","updatedAt":""},{"id":"p14","categorie":"Petit-déjeuner","nom":"Œufs","quantite":"24 unités","frequence":"Hebdomadaire","seuil":"6 unités","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Plein","aAcheter":false,"dernierAchat":"2026-06-19","canal":"Marché","prix":9.0,"createdAt":"","updatedAt":""},{"id":"p15","categorie":"Petit-déjeuner","nom":"Jambon","quantite":"500 g","frequence":"Hebdomadaire","seuil":"150 g","niveau":1,"niveauLibelle":"Socle","souplesse":"Faible","stock":"Bas","aAcheter":true,"dernierAchat":"2026-07-01","canal":"Supermarché","prix":5.0,"createdAt":"","updatedAt":""},{"id":"p16","categorie":"Petit-déjeuner","nom":"Café","quantite":"500 g","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Faible","stock":"Plein","aAcheter":false,"dernierAchat":"2026-07-01","canal":"Supermarché","prix":8.0,"createdAt":"","updatedAt":""},{"id":"p17","categorie":"Petit-déjeuner","nom":"Ricoré","quantite":"500 g","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Faible","stock":"Plein","aAcheter":false,"dernierAchat":"2026-06-12","canal":"Supermarché","prix":6.0,"createdAt":"","updatedAt":""},{"id":"p18","categorie":"Petit-déjeuner","nom":"Cacahuète / Noix","quantite":"500 g","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":1,"niveauLibelle":"Socle","souplesse":"Faible","stock":"Moyen","aAcheter":false,"dernierAchat":"2026-07-01","canal":"Supermarché","prix":4.0,"createdAt":"","updatedAt":""},{"id":"p19","categorie":"Fruits","nom":"Oranges","quantite":"2 kg","frequence":"Hebdomadaire","seuil":"0,5 kg","niveau":4,"niveauLibelle":"Confort","souplesse":"Très élevée","stock":"Bas","aAcheter":false,"dernierAchat":"","canal":"Marché","prix":3.0,"createdAt":"","updatedAt":""},{"id":"p20","categorie":"Fruits","nom":"Bananes","quantite":"1,5 kg","frequence":"Hebdomadaire","seuil":"0,5 kg","niveau":3,"niveauLibelle":"Rotation","souplesse":"Élevée","stock":"Plein","aAcheter":false,"dernierAchat":"2026-07-07","canal":"Marché","prix":2.5,"createdAt":"","updatedAt":""},{"id":"p21","categorie":"Fruits","nom":"Citrons","quantite":"4–6 pièces","frequence":"Hebdomadaire","seuil":"2 pièces","niveau":1,"niveauLibelle":"Socle","souplesse":"Faible","stock":"Bas","aAcheter":true,"dernierAchat":"2026-07-07","canal":"Marché","prix":3.0,"createdAt":"","updatedAt":""},{"id":"p22","categorie":"Légumes","nom":"Brocolis","quantite":"1,5 kg","frequence":"Hebdomadaire","seuil":"0,5 kg","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Faible","stock":"Plein","aAcheter":false,"dernierAchat":"2026-07-01","canal":"Marché","prix":5.5,"createdAt":"","updatedAt":""},{"id":"p23","categorie":"Légumes","nom":"Haricots verts","quantite":"1,5 kg","frequence":"Hebdomadaire","seuil":"0,5 kg","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Faible","stock":"Bas","aAcheter":true,"dernierAchat":"2026-07-01","canal":"Marché","prix":4.0,"createdAt":"","updatedAt":""},{"id":"p24","categorie":"Légumes","nom":"Courgettes","quantite":"1,5 kg","frequence":"Hebdomadaire","seuil":"0,5 kg","niveau":3,"niveauLibelle":"Rotation","souplesse":"Moyenne","stock":"Moyen","aAcheter":false,"dernierAchat":"2026-07-07","canal":"Marché","prix":5.0,"createdAt":"","updatedAt":""},{"id":"p25","categorie":"Légumes","nom":"Champignons","quantite":"1 kg","frequence":"Hebdomadaire","seuil":"0,3 kg","niveau":3,"niveauLibelle":"Rotation","souplesse":"Moyenne","stock":"Bas","aAcheter":true,"dernierAchat":"2026-05-16","canal":"Marché","prix":6.25,"createdAt":"","updatedAt":""},{"id":"p26","categorie":"Légumes","nom":"Tomates / Sauce tomates","quantite":"1,5 kg","frequence":"Hebdomadaire","seuil":"0,5 kg","niveau":3,"niveauLibelle":"Rotation","souplesse":"Moyenne","stock":"Bas","aAcheter":true,"dernierAchat":"2026-06-12","canal":"Marché","prix":5.0,"createdAt":"","updatedAt":""},{"id":"p27","categorie":"Légumes","nom":"Laitue","quantite":"2 pièces","frequence":"Hebdomadaire","seuil":"1 pièce","niveau":4,"niveauLibelle":"Confort","souplesse":"Très élevée","stock":"Bas","aAcheter":false,"dernierAchat":"2026-01-19","canal":"Marché","prix":3.0,"createdAt":"","updatedAt":""},{"id":"p28","categorie":"Légumes","nom":"Aubergines","quantite":"1 kg","frequence":"Hebdomadaire","seuil":"0,3 kg","niveau":4,"niveauLibelle":"Confort","souplesse":"Très élevée","stock":"Bas","aAcheter":false,"dernierAchat":"2026-04-18","canal":"Marché","prix":5.0,"createdAt":"","updatedAt":""},{"id":"p29","categorie":"Légumes","nom":"Poivrons","quantite":"1 kg","frequence":"Hebdomadaire","seuil":"0,3 kg","niveau":4,"niveauLibelle":"Confort","souplesse":"Très élevée","stock":"Bas","aAcheter":false,"dernierAchat":"2026-05-09","canal":"Marché","prix":3.0,"createdAt":"","updatedAt":""},{"id":"p30","categorie":"Légumes","nom":"Oignons","quantite":"1 kg","frequence":"Bi-mensuelle","seuil":"300 g","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Plein","aAcheter":false,"dernierAchat":"2026-05-23","canal":"Marché","prix":4.0,"createdAt":"","updatedAt":""},{"id":"p31","categorie":"Légumes","nom":"Ail","quantite":"2 têtes","frequence":"Bi-mensuelle","seuil":"1 tête","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Moyen","aAcheter":false,"dernierAchat":"2026-06-19","canal":"Marché","prix":4.0,"createdAt":"","updatedAt":""},{"id":"p32","categorie":"Féculents","nom":"Riz","quantite":"2 kg","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Moyen","aAcheter":false,"dernierAchat":"2026-07-07","canal":"Supermarché","prix":5.0,"createdAt":"","updatedAt":""},{"id":"p33","categorie":"Féculents","nom":"Pâtes","quantite":"2 kg","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Moyen","aAcheter":false,"dernierAchat":"2026-07-07","canal":"Supermarché","prix":7.0,"createdAt":"","updatedAt":""},{"id":"p34","categorie":"Féculents","nom":"Semoule","quantite":"1 kg","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Plein","aAcheter":false,"dernierAchat":"2026-07-01","canal":"Supermarché","prix":3.0,"createdAt":"","updatedAt":""},{"id":"p35","categorie":"Féculents","nom":"Racines (igname/patate/plantain/pommes de terre)","quantite":"3 kg","frequence":"Bi-mensuelle","seuil":"1 kg","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Bas","aAcheter":true,"dernierAchat":"2026-07-07","canal":"Marché","prix":15.0,"createdAt":"","updatedAt":""},{"id":"p36","categorie":"Légumineuses","nom":"Lentilles","quantite":"1 kg","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Faible","stock":"Plein","aAcheter":false,"dernierAchat":"2026-07-01","canal":"Supermarché","prix":4.0,"createdAt":"","updatedAt":""},{"id":"p37","categorie":"Légumineuses","nom":"Haricots rouges","quantite":"1 kg","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Faible","stock":"Moyen","aAcheter":false,"dernierAchat":"2026-06-06","canal":"Supermarché","prix":4.5,"createdAt":"","updatedAt":""},{"id":"p38","categorie":"Protéines","nom":"Poulet fermier","quantite":"2 kg","frequence":"Hebdomadaire","seuil":"0,5 kg","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Bas","aAcheter":true,"dernierAchat":"2026-07-07","canal":"Marché","prix":15.0,"createdAt":"","updatedAt":""},{"id":"p39","categorie":"Protéines","nom":"Sardines","quantite":"5 paquets","frequence":"Hebdomadaire","seuil":"2 paquets","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Faible","stock":"Moyen","aAcheter":false,"dernierAchat":"2026-07-01","canal":"Supermarché","prix":4.5,"createdAt":"","updatedAt":""},{"id":"p40","categorie":"Protéines","nom":"Thon / Fruits de mer / Gésiers / Côtes de porc","quantite":"1,5 kg","frequence":"Hebdomadaire","seuil":"0,5 kg","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Faible","stock":"Moyen","aAcheter":true,"dernierAchat":"2026-06-12","canal":"Marché","prix":10.0,"createdAt":"","updatedAt":""},{"id":"p41","categorie":"Protéines","nom":"Salaisons Queues / Poitrine fumée","quantite":"2 kg","frequence":"Hebdomadaire","seuil":"0,5 kg","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Bas","aAcheter":true,"dernierAchat":"2026-07-01","canal":"Marché","prix":15.0,"createdAt":"","updatedAt":""},{"id":"p42","categorie":"Boissons","nom":"Eau en bouteille","quantite":"45 L","frequence":"Hebdomadaire","seuil":"9 L","niveau":1,"niveauLibelle":"Socle","souplesse":"Faible","stock":"Bas","aAcheter":true,"dernierAchat":"2026-07-01","canal":"Drive","prix":30.0,"createdAt":"","updatedAt":""},{"id":"p43","categorie":"Boissons","nom":"Sirops","quantite":"1 bouteille","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":3,"niveauLibelle":"Rotation","souplesse":"Élevée","stock":"Moyen","aAcheter":false,"dernierAchat":"2026-05-02","canal":"Supermarché","prix":4.5,"createdAt":"","updatedAt":""},{"id":"p44","categorie":"Boissons","nom":"Bières / Panaché","quantite":"6 unités","frequence":"Hebdomadaire","seuil":"2 unités","niveau":4,"niveauLibelle":"Confort","souplesse":"Très élevée","stock":"Bas","aAcheter":false,"dernierAchat":"2026-06-12","canal":"Supermarché","prix":6.0,"createdAt":"","updatedAt":""},{"id":"p45","categorie":"Boissons","nom":"Jus","quantite":"3 unités","frequence":"Hebdomadaire","seuil":"1 unité","niveau":4,"niveauLibelle":"Confort","souplesse":"Très élevée","stock":"Plein","aAcheter":false,"dernierAchat":"","canal":"Supermarché","prix":6.0,"createdAt":"","updatedAt":""},{"id":"p46","categorie":"Cuisine","nom":"Farine","quantite":"3 kg","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Faible","stock":"Plein","aAcheter":false,"dernierAchat":"2026-07-01","canal":"Supermarché","prix":4.5,"createdAt":"","updatedAt":""},{"id":"p47","categorie":"Cuisine","nom":"Huiles","quantite":"1 bouteille","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Faible","stock":"Plein","aAcheter":false,"dernierAchat":"2026-06-19","canal":"Supermarché","prix":10.0,"createdAt":"","updatedAt":""},{"id":"p48","categorie":"Cuisine","nom":"Vinaigre","quantite":"1 bouteille","frequence":"Mensuel","seuil":"30 % restant","niveau":3,"niveauLibelle":"Rotation","souplesse":"Élevée","stock":"Plein","aAcheter":false,"dernierAchat":"2026-05-02","canal":"Supermarché","prix":3.0,"createdAt":"","updatedAt":""},{"id":"p49","categorie":"Cuisine","nom":"Moutarde","quantite":"1 pot","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Bas","aAcheter":true,"dernierAchat":"2026-03-20","canal":"Supermarché","prix":3.5,"createdAt":"","updatedAt":""},{"id":"p50","categorie":"Cuisine","nom":"Sel","quantite":"1 paquet","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Faible","stock":"Plein","aAcheter":false,"dernierAchat":"2026-01-03","canal":"Supermarché","prix":1.7,"createdAt":"","updatedAt":""},{"id":"p51","categorie":"Cuisine","nom":"Épices","quantite":"Assortiment","frequence":"Bi-mensuelle","seuil":"30 % restant","niveau":3,"niveauLibelle":"Rotation","souplesse":"Élevée","stock":"Bas","aAcheter":true,"dernierAchat":"2026-03-14","canal":"Supermarché","prix":15.0,"createdAt":"","updatedAt":""},{"id":"p52","categorie":"Entretien","nom":"Lessive lave-linge","quantite":"1 bidon","frequence":"Bi-mensuelle","seuil":"Dernier bidon","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Faible","stock":"Plein","aAcheter":false,"dernierAchat":"2026-07-01","canal":"Supermarché","prix":15.0,"createdAt":"","updatedAt":""},{"id":"p53","categorie":"Entretien","nom":"Produit lave-vaisselle","quantite":"1 boîte","frequence":"Bi-mensuelle","seuil":"Dernière boîte","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Faible","stock":"Plein","aAcheter":false,"dernierAchat":"2026-05-23","canal":"Supermarché","prix":4.5,"createdAt":"","updatedAt":""},{"id":"p54","categorie":"Entretien","nom":"Sel régénérant","quantite":"1 paquet","frequence":"Bi-mensuelle","seuil":"Dernier paquet","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Plein","aAcheter":false,"dernierAchat":"","canal":"Supermarché","prix":5.5,"createdAt":"","updatedAt":""},{"id":"p55","categorie":"Entretien","nom":"Liquide vaisselle","quantite":"1 flacon","frequence":"Bi-mensuelle","seuil":"Dernier flacon","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Plein","aAcheter":false,"dernierAchat":"2026-05-23","canal":"Supermarché","prix":3.0,"createdAt":"","updatedAt":""},{"id":"p56","categorie":"Entretien","nom":"Liquide lave mains","quantite":"1 flacon","frequence":"Bi-mensuelle","seuil":"Dernier flacon","niveau":3,"niveauLibelle":"Rotation","souplesse":"Élevée","stock":"Bas","aAcheter":true,"dernierAchat":"2026-05-23","canal":"Supermarché","prix":3.0,"createdAt":"","updatedAt":""},{"id":"p57","categorie":"Entretien","nom":"Nettoyant sols","quantite":"1 flacon","frequence":"Bi-mensuelle","seuil":"Dernier flacon","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Plein","aAcheter":false,"dernierAchat":"2026-05-02","canal":"Supermarché","prix":5.0,"createdAt":"","updatedAt":""},{"id":"p58","categorie":"Entretien","nom":"Nettoyant surfaces / Javel","quantite":"1 flacon","frequence":"Bi-mensuelle","seuil":"Dernier flacon","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Plein","aAcheter":false,"dernierAchat":"2026-05-02","canal":"Supermarché","prix":5.0,"createdAt":"","updatedAt":""},{"id":"p59","categorie":"Entretien","nom":"Sacs poubelle / Éponges","quantite":"1 rouleau","frequence":"Bi-mensuelle","seuil":"Dernier rouleau","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Faible","stock":"Bas","aAcheter":true,"dernierAchat":"2026-06-12","canal":"Supermarché","prix":7.0,"createdAt":"","updatedAt":""},{"id":"p60","categorie":"Entretien","nom":"Papier toilette","quantite":"1 paquet","frequence":"Bi-mensuelle","seuil":"Dernier paquet","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Faible","stock":"Plein","aAcheter":false,"dernierAchat":"2026-07-01","canal":"Supermarché","prix":6.0,"createdAt":"","updatedAt":""},{"id":"p61","categorie":"Entretien","nom":"Essuie-tout","quantite":"1 paquet","frequence":"Bi-mensuelle","seuil":"Dernier paquet","niveau":2,"niveauLibelle":"Stratégique","souplesse":"Moyenne","stock":"Plein","aAcheter":false,"dernierAchat":"2026-05-23","canal":"Supermarché","prix":6.0,"createdAt":"","updatedAt":""}];
+const APP_KEY='dorox_v1_state';
+const LEGACY_KEY='madoey_inventaire_v1_1';
+let currentView='dashboard';
+let decisionFilter='all';
+
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+const clone=o=>JSON.parse(JSON.stringify(o));
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const euro=v=>Number(v||0).toLocaleString('fr-FR',{style:'currency',currency:'EUR'});
+const localDateParts=()=>{const d=new Date();return {y:d.getFullYear(),m:String(d.getMonth()+1).padStart(2,'0'),day:String(d.getDate()).padStart(2,'0')}};
+const isoToday=()=>{const d=localDateParts();return `${d.y}-${d.m}-${d.day}`};
+const currentMonth=()=>{const d=localDateParts();return `${d.y}-${d.m}`};
+const fmtDate=s=>{if(!s)return 'Non renseigné';const d=new Date(s+'T12:00:00');return Number.isNaN(d.getTime())?s:d.toLocaleDateString('fr-FR')};
+const fmtDateTime=s=>{const d=new Date(s);return Number.isNaN(d.getTime())?s:d.toLocaleString('fr-FR',{dateStyle:'medium',timeStyle:'short'})};
+const uid=p=>p+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+
+function normalizeProduct(p){
+  const rawLevel=Number(p.niveau||({Socle:1,'Stratégique':2,Rotation:3,Confort:4}[p.niveauLibelle||p.importance])||3);
+  const niveau=[1,2,3,4].includes(rawLevel)?rawLevel:3;
+  let souplesse=String(p.souplesse||'Moyenne').trim();
+  if(souplesse==='Elevée')souplesse='Élevée';
+  if(!Object.hasOwn(FLEX_RANK,souplesse))souplesse='Moyenne';
+  const stock=['Plein','Moyen','Bas','Épuisé'].includes(p.stock)?p.stock:'Moyen';
+  return {id:p.id||uid('p'),categorie:String(p.categorie||'Autres').trim(),nom:String(p.nom||'Produit sans nom').trim(),quantite:String(p.quantite||'').trim(),frequence:String(p.frequence||'').trim(),seuil:String(p.seuil||'').trim(),niveau,niveauLibelle:LEVEL_LABELS[niveau],souplesse,stock,aAcheter:!!p.aAcheter,dernierAchat:p.dernierAchat||'',canal:String(p.canal||'').trim(),prix:Number(p.prix||0),createdAt:p.createdAt||'',updatedAt:p.updatedAt||''};
+}
+function defaultState(products=INITIAL_DATA){return {version:1,settings:{baseBudget:400,adjustedBudget:null,reserve:20,currentPhase:1,useReserve:false,activeMonth:currentMonth()},products:clone(products).map(normalizeProduct),session:null,history:[]}}
+function loadState(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(APP_KEY));
+    if(saved&&Array.isArray(saved.products))return migrateState(saved);
+  }catch(e){console.warn(e)}
+  try{
+    const legacy=JSON.parse(localStorage.getItem(LEGACY_KEY));
+    if(Array.isArray(legacy))return defaultState(legacy);
+  }catch(e){console.warn(e)}
+  return defaultState();
+}
+function migrateState(s){
+  const d=defaultState(s.products||INITIAL_DATA);
+  return {...d,...s,settings:{...d.settings,...(s.settings||{})},products:(s.products||d.products).map(normalizeProduct),history:Array.isArray(s.history)?s.history:[],session:s.session||null};
+}
+let state=loadState();
+function persist(){try{localStorage.setItem(APP_KEY,JSON.stringify(state));return true}catch(e){console.warn(e);return false}}
+function toast(text){const t=$('#toast');t.textContent=text;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),1900)}
+function categories(){return [...new Set(state.products.map(p=>p.categorie).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'fr'))}
+function budgetValue(){return state.settings.adjustedBudget===null||state.settings.adjustedBudget===''?Number(state.settings.baseBudget):Number(state.settings.adjustedBudget)}
+function spentForMonth(){return state.history.filter(h=>h.month===state.settings.activeMonth).reduce((s,h)=>s+Number(h.totalActual||0),0)}
+function protectedReserve(){return state.settings.useReserve?0:Number(state.settings.reserve||0)}
+function spendableRemaining(){return Math.max(0,budgetValue()-spentForMonth()-protectedReserve())}
+function absoluteRemaining(){return budgetValue()-spentForMonth()}
+function daysForFrequency(text){const s=String(text||'').toLowerCase();if(s.includes('hebdom'))return 7;if(s.includes('bi-mens')||s.includes('bimens'))return 14;if(s.includes('mens'))return 30;return null}
+function isDue(p){const days=daysForFrequency(p.frequence);if(!days||!p.dernierAchat)return false;const last=new Date(p.dernierAchat+'T12:00:00');if(Number.isNaN(last.getTime()))return false;return (Date.now()-last.getTime())/86400000>=days}
+function block1(p){
+  if(p.aAcheter)return {status:'examine',reasons:['Ajouté manuellement']};
+  if(p.stock==='Épuisé')return {status:'examine',reasons:['Stock épuisé']};
+  if(p.stock==='Bas')return {status:'examine',reasons:['Stock bas']};
+  if(p.stock==='Moyen'&&isDue(p))return {status:'monitor',reasons:['Fréquence habituelle atteinte']};
+  return {status:'none',reasons:[]};
+}
+function priorityFor(p){
+  let score=0;
+  score+=p.stock==='Épuisé'?40:p.stock==='Bas'?25:0;
+  score+=({1:40,2:30,3:20,4:10}[p.niveau]||0);
+  score+=({'Faible':20,'Moyenne':12,'Élevée':6,'Très élevée':0}[p.souplesse]||0);
+  if(p.aAcheter)score+=15;if(isDue(p))score+=5;
+  return score;
+}
+function itemReasons(p){const r=block1(p).reasons.slice();if(isDue(p)&&!r.includes('Fréquence habituelle atteinte'))r.push('Fréquence habituelle atteinte');if(p.niveau===1)r.push('Produit Socle');else if(p.niveau===2)r.push('Produit Stratégique');if(p.souplesse==='Faible')r.push('Souplesse faible');return r}
+function examinationProducts(){return state.products.filter(p=>block1(p).status==='examine').sort((a,b)=>priorityFor(b)-priorityFor(a)||a.nom.localeCompare(b.nom,'fr'))}
+function monitorProducts(){return state.products.filter(p=>block1(p).status==='monitor')}
+function makeSession(){
+  const items=examinationProducts().map(p=>({productId:p.id,name:p.nom,quantity:p.quantite,estimatedPrice:Number(p.prix||0),actualPrice:Number(p.prix||0),decision:'pending',purchased:false,notFound:false,reasons:itemReasons(p),priorityScore:priorityFor(p),suggestedReport:false}));
+  state.session={id:uid('cycle'),createdAt:new Date().toISOString(),phase:Number(state.settings.currentPhase),month:state.settings.activeMonth,items};
+  recalcReportSuggestions();persist();renderAll();toast('Liste proposée générée');
+}
+function recalcReportSuggestions(){
+  if(!state.session)return;
+  state.session.items.forEach(i=>i.suggestedReport=false);
+  const active=state.session.items.filter(i=>!['postponed','excluded'].includes(i.decision));
+  const total=active.reduce((s,i)=>s+Number(i.estimatedPrice||0),0);
+  let excess=total-spendableRemaining();if(excess<=0)return;
+  const candidates=active.slice().sort((a,b)=>{
+    const pa=state.products.find(p=>p.id===a.productId),pb=state.products.find(p=>p.id===b.productId);
+    return (pb?.niveau||3)-(pa?.niveau||3)||(FLEX_RANK[pb?.souplesse]||2)-(FLEX_RANK[pa?.souplesse]||2)||a.priorityScore-b.priorityScore||Number(b.estimatedPrice)-Number(a.estimatedPrice);
+  });
+  for(const i of candidates){if(excess<=0)break;i.suggestedReport=true;excess-=Number(i.estimatedPrice||0)}
+}
+function activeSessionItems(){return state.session?state.session.items.filter(i=>['validated','modified'].includes(i.decision)):[]}
+function selectedEstimatedTotal(){return activeSessionItems().reduce((s,i)=>s+Number(i.estimatedPrice||0),0)}
+function purchasedTotal(){return activeSessionItems().filter(i=>i.purchased&&!i.notFound).reduce((s,i)=>s+Number(i.actualPrice||0),0)}
+function setView(name){currentView=name;$$('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));$$('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===name));window.scrollTo({top:0,behavior:'smooth'});renderAll()}
+
+function renderHeader(){const b=budgetValue();$('#headerBudget').textContent=`Phase ${state.settings.currentPhase} · ${euro(b)}`}
+function renderDashboard(){
+  const budget=budgetValue(),spent=spentForMonth(),remaining=absoluteRemaining(),pct=budget>0?Math.min(100,Math.max(0,spent/budget*100)):0;
+  $('#budgetPanel').innerHTML=`<div class="panel-title"><div><h3>Budget ${esc(state.settings.activeMonth)}</h3><div class="sub">${state.settings.adjustedBudget!==null&&state.settings.adjustedBudget!==''?'Budget ajusté pour ce mois':'Budget habituel'}</div></div><button class="btn btn-secondary btn-small" data-action="edit-budget" type="button">Modifier</button></div><div class="budget-row"><div><div class="budget-big">${euro(remaining)}</div><div class="small muted">restant sur ${euro(budget)}</div></div><div class="small" style="text-align:right">Dépensé<br><strong>${euro(spent)}</strong></div></div><div class="progress"><span style="width:${pct}%"></span></div><div class="small muted">Réserve protégée : ${euro(protectedReserve())}${state.settings.useReserve?' · utilisée':''}</div>`;
+  $('#dashLow').textContent=state.products.filter(p=>['Bas','Épuisé'].includes(p.stock)).length;
+  $('#dashExamine').textContent=examinationProducts().length;$('#dashMonitor').textContent=monitorProducts().length;
+  $('#dashCycles').textContent=state.history.filter(h=>h.month===state.settings.activeMonth).length;
+  if(!state.session){$('#currentCyclePanel').innerHTML=`<h3>Prochaine préparation</h3><div class="sub">${examinationProducts().length} produit(s) méritent votre attention.</div><div class="actions"><button class="btn btn-primary" data-action="generate" type="button">Préparer la liste</button><button class="btn btn-secondary" data-view-jump="inventory" type="button">Mettre à jour le stock</button></div>`}
+  else{const valid=activeSessionItems().length;$('#currentCyclePanel').innerHTML=`<h3>Cycle en cours · Phase ${state.session.phase}</h3><div class="sub">${state.session.items.length} proposition(s), ${valid} validée(s), total sélectionné ${euro(selectedEstimatedTotal())}.</div><div class="actions"><button class="btn btn-primary" data-view-jump="prepare" type="button">Continuer l’arbitrage</button>${valid?'<button class="btn btn-green" data-view-jump="shopping" type="button">Ouvrir le mode Courses</button>':''}</div>`}
+}
+function fillInventoryFilters(){const select=$('#filterCategory'),current=select.value;select.innerHTML='<option value="">Toutes les catégories</option>'+categories().map(c=>`<option>${esc(c)}</option>`).join('');select.value=current;$('#categoryList').innerHTML=categories().map(c=>`<option value="${esc(c)}">`).join('')}
+function inventoryFiltered(){const q=$('#searchInventory').value.trim().toLowerCase(),cat=$('#filterCategory').value,stock=$('#filterStock').value,level=$('#filterLevel').value;return state.products.filter(p=>(!q||[p.nom,p.categorie,p.canal].join(' ').toLowerCase().includes(q))&&(!cat||p.categorie===cat)&&(!stock||p.stock===stock)&&(!level||String(p.niveau)===level))}
+function renderInventory(){
+  fillInventoryFilters();const arr=inventoryFiltered();if(!arr.length){$('#inventoryList').innerHTML='<div class="empty">Aucun produit ne correspond aux filtres.</div>';return}
+  const groups={};arr.sort((a,b)=>a.categorie.localeCompare(b.categorie,'fr')||a.niveau-b.niveau||a.nom.localeCompare(b.nom,'fr')).forEach(p=>(groups[p.categorie]??=[]).push(p));
+  $('#inventoryList').innerHTML=Object.entries(groups).map(([cat,items])=>`<h3 class="section-title">${esc(cat)} · ${items.length}</h3>${items.map(p=>`<article class="product-card"><div class="card-head"><div><h3>${esc(p.nom)}</h3><div class="sub">${esc(p.quantite||'Quantité non renseignée')} · ${esc(p.frequence||'Fréquence non renseignée')}</div></div><div class="price">${euro(p.prix)}</div></div><div class="badges"><span class="badge stock-${esc(p.stock)}">${esc(p.stock)}</span><span class="badge">${esc(p.niveauLibelle)}</span><span class="badge">Souplesse ${esc(p.souplesse.toLowerCase())}</span>${p.aAcheter?'<span class="badge badge-status">Ajout manuel</span>':''}</div><div class="decision-actions"><button class="btn btn-secondary btn-small" data-action="edit-product" data-id="${p.id}" type="button">Modifier</button><button class="btn btn-secondary btn-small" data-action="toggle-manual" data-id="${p.id}" type="button">${p.aAcheter?'Retirer l’ajout':'Ajouter à la préparation'}</button><button class="btn btn-danger btn-small" data-action="delete-product" data-id="${p.id}" type="button">Supprimer</button></div></article>`).join('')}`).join('')
+}
+function decisionLabel(d){return {pending:'À examiner',validated:'Validé',modified:'Modifié',postponed:'Reporté',excluded:'Écarté'}[d]||d}
+function renderPreparation(){
+  if(!state.session){$('#prepareSummary').innerHTML=`<div class="panel"><h3>Créer la liste proposée</h3><div class="sub">${examinationProducts().length} produit(s) seront examinés. ${monitorProducts().length} autre(s) restent simplement à surveiller.</div><div class="actions"><button class="btn btn-primary" data-action="generate" type="button">Générer la liste</button></div></div>`;$('#decisionFilters').style.display='none';$('#proposalList').innerHTML='';return}
+  $('#decisionFilters').style.display='flex';recalcReportSuggestions();
+  const allActive=state.session.items.filter(i=>!['postponed','excluded'].includes(i.decision));const proposed=allActive.reduce((s,i)=>s+Number(i.estimatedPrice||0),0);const selected=selectedEstimatedTotal(),available=spendableRemaining();
+  const report=state.session.items.filter(i=>i.suggestedReport&&!['postponed','excluded'].includes(i.decision));
+  let callout=proposed>available?`<div class="callout"><strong>Arbitrage conseillé</strong>Le panier potentiel dépasse le budget disponible de ${euro(proposed-available)}. ${report.length?`DOROX suggère d’examiner le report de : ${report.slice(0,4).map(i=>esc(i.name)).join(', ')}${report.length>4?'…':''}.`:''}</div>`:`<div class="callout good"><strong>Budget cohérent</strong>Le panier potentiel reste dans le budget disponible.</div>`;
+  $('#prepareSummary').innerHTML=`<div class="panel"><div class="panel-title"><div><h3>Liste proposée · Phase ${state.session.phase}</h3><div class="sub">Budget disponible hors réserve : ${euro(available)}</div></div><button class="btn btn-secondary btn-small" data-action="regenerate" type="button">Régénérer</button></div><div class="grid-metrics"><div class="metric"><span>Panier potentiel</span><strong>${euro(proposed)}</strong></div><div class="metric"><span>Votre sélection</span><strong>${euro(selected)}</strong></div><div class="metric"><span>Validés</span><strong>${activeSessionItems().length}</strong></div><div class="metric"><span>Réserve</span><strong>${euro(protectedReserve())}</strong></div></div>${callout}<div class="actions"><button class="btn btn-green" data-view-jump="shopping" type="button" ${activeSessionItems().length?'':'disabled'}>Démarrer les courses</button></div></div>`;
+  let items=state.session.items.slice();if(decisionFilter!=='all')items=items.filter(i=>i.decision===decisionFilter||(decisionFilter==='validated'&&i.decision==='modified'));
+  if(!items.length){$('#proposalList').innerHTML='<div class="empty">Aucun produit dans cette catégorie.</div>';return}
+  $('#proposalList').innerHTML=items.map(i=>{const p=state.products.find(x=>x.id===i.productId);return `<article class="decision-card"><div class="card-head"><div><h3>${esc(i.name)}</h3><div class="sub">${esc(i.quantity||'Quantité à définir')} · ${p?esc(p.canal||'Canal non renseigné'):''}</div></div><div class="price">${euro(i.estimatedPrice)}</div></div><div class="badges"><span class="badge ${['validated','modified'].includes(i.decision)?'badge-ok':i.decision==='pending'?'badge-status':'badge-warn'}">${decisionLabel(i.decision)}</span>${i.suggestedReport&&!['postponed','excluded'].includes(i.decision)?'<span class="badge badge-warn">Report possible</span>':''}${p?`<span class="badge stock-${esc(p.stock)}">Stock ${esc(p.stock.toLowerCase())}</span>`:''}</div><div class="decision-actions"><button class="btn btn-green btn-small" data-action="decide" data-id="${i.productId}" data-value="validated" type="button">Valider</button><button class="btn btn-secondary btn-small" data-action="edit-item" data-id="${i.productId}" type="button">Modifier</button><button class="btn btn-secondary btn-small" data-action="decide" data-id="${i.productId}" data-value="postponed" type="button">Reporter</button><button class="btn btn-danger btn-small" data-action="decide" data-id="${i.productId}" data-value="excluded" type="button">Écarter</button><button class="btn btn-link btn-small" data-action="why" data-id="${i.productId}" type="button">Pourquoi ?</button></div><div class="why" id="why-${i.productId}" hidden><ul>${i.reasons.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></div></article>`}).join('')
+}
+function renderShopping(){
+  if(!state.session||!activeSessionItems().length){$('#shoppingSummary').innerHTML='<div class="empty">Aucun produit n’a encore été validé. Préparez et arbitrez votre liste avant de démarrer les courses.</div>';$('#shoppingList').innerHTML='';return}
+  const items=activeSessionItems(),actual=purchasedTotal(),remaining=spendableRemaining()-actual;
+  $('#shoppingSummary').innerHTML=`<div class="panel"><div class="grid-metrics"><div class="metric"><span>Produits retenus</span><strong>${items.length}</strong></div><div class="metric"><span>Achetés</span><strong>${items.filter(i=>i.purchased&&!i.notFound).length}</strong></div><div class="metric"><span>Panier réel</span><strong>${euro(actual)}</strong></div><div class="metric"><span>Disponible après panier</span><strong>${euro(remaining)}</strong></div></div>${remaining<0?`<div class="callout"><strong>Dépassement actuel</strong>Le panier réel dépasse le budget disponible de ${euro(Math.abs(remaining))}.</div>`:''}<div class="actions"><button class="btn btn-green" data-action="close-cycle" type="button">Clôturer l’inventaire</button><button class="btn btn-secondary" data-view-jump="prepare" type="button">Revenir à l’arbitrage</button></div></div>`;
+  $('#shoppingList').innerHTML=items.map(i=>`<article class="course-card ${i.purchased?'done':''} ${i.notFound?'not-found':''}"><div class="course-line"><input class="course-check" data-action="purchase" data-id="${i.productId}" type="checkbox" ${i.purchased&&!i.notFound?'checked':''} aria-label="Acheté : ${esc(i.name)}"><div><h3 style="margin:0;font-size:1rem">${esc(i.name)}</h3><div class="sub">${esc(i.quantity||'Quantité à définir')} · estimé ${euro(i.estimatedPrice)}</div></div><input class="price-input" data-action="actual-price" data-id="${i.productId}" type="number" min="0" step="0.01" value="${Number(i.actualPrice||0)}" aria-label="Prix réel de ${esc(i.name)}"></div><div class="course-actions"><button class="btn btn-secondary btn-small" data-action="not-found" data-id="${i.productId}" type="button">${i.notFound?'Annuler « non trouvé »':'Non trouvé'}</button>${i.notFound?'<span class="small muted">Restera à acheter</span>':''}</div></article>`).join('')
+}
+function renderHistory(){
+  const arr=state.history.slice().sort((a,b)=>String(b.closedAt).localeCompare(String(a.closedAt)));
+  if(!arr.length){$('#historyList').innerHTML='<div class="empty">Aucun inventaire clôturé pour le moment.</div>';return}
+  $('#historyList').innerHTML=arr.map(h=>`<details class="history-card"><summary>Phase ${h.phase} · ${fmtDateTime(h.closedAt)}</summary><div class="history-meta"><span>${h.items.filter(i=>i.purchased&&!i.notFound).length} achat(s)</span><strong>${euro(h.totalActual)}</strong></div><ul class="history-items">${h.items.map(i=>{const result=i.purchased&&!i.notFound?euro(i.actualPrice):i.notFound?'Non trouvé':i.decision==='postponed'?'Reporté':i.decision==='excluded'?'Écarté':i.decision==='pending'?'Non arbitré':'Non acheté';return `<li>${esc(i.name)} — ${result}</li>`}).join('')}</ul></details>`).join('')
+}
+function renderAll(){renderHeader();renderDashboard();renderInventory();renderPreparation();renderShopping();renderHistory()}
+
+function openBudget(){const s=state.settings;$('#activeMonth').value=s.activeMonth;$('#currentPhase').value=String(s.currentPhase);$('#baseBudget').value=s.baseBudget;$('#adjustedBudget').value=s.adjustedBudget??'';$('#reserveBudget').value=s.reserve;$('#useReserve').checked=!!s.useReserve;$('#budgetDialog').showModal()}
+function openProduct(p=null){$('#productForm').reset();$('#productId').value=p?.id||'';$('#productFormTitle').textContent=p?'Modifier le produit':'Ajouter un produit';$('#productName').value=p?.nom||'';$('#productCategory').value=p?.categorie||'';$('#productStock').value=p?.stock||'Moyen';$('#productQuantity').value=p?.quantite||'';$('#productFrequency').value=p?.frequence||'';$('#productThreshold').value=p?.seuil||'';$('#productChannel').value=p?.canal||'';$('#productPrice').value=p?.prix??'';$('#productLastBuy').value=p?.dernierAchat||'';$('#productLevel').value=String(p?.niveau||2);$('#productFlex').value=p?.souplesse||'Moyenne';$('#productManualBuy').checked=!!p?.aAcheter;$('#productDialog').showModal()}
+function openItem(id){const i=state.session?.items.find(x=>x.productId===id);if(!i)return;$('#itemProductId').value=id;$('#itemDialogName').textContent=i.name;$('#itemQuantity').value=i.quantity;$('#itemPrice').value=i.estimatedPrice;$('#itemDialog').showModal()}
+function closeCycle(){const items=activeSessionItems(),purchased=items.filter(i=>i.purchased&&!i.notFound);$('#closeSummary').textContent=`${purchased.length} produit(s) acheté(s) pour ${euro(purchasedTotal())}. La clôture sera ajoutée à l’historique.`;$('#advancePhase').checked=state.settings.currentPhase<4;$('#closeDialog').showModal()}
+function exportData(){const payload={app:'DOROX',version:1,exportedAt:new Date().toISOString(),state};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`dorox-sauvegarde-${isoToday()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Sauvegarde exportée')}
+
+$$('.nav-btn').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
+$('#headerBudget').addEventListener('click',openBudget);$('#addProductBtn').addEventListener('click',()=>openProduct());
+['searchInventory','filterCategory','filterStock','filterLevel'].forEach(id=>$('#'+id).addEventListener(id==='searchInventory'?'input':'change',renderInventory));
+$('#budgetForm').addEventListener('submit',e=>{e.preventDefault();state.settings.activeMonth=$('#activeMonth').value;state.settings.currentPhase=Number($('#currentPhase').value);state.settings.baseBudget=Number($('#baseBudget').value||400);state.settings.adjustedBudget=$('#adjustedBudget').value===''?null:Number($('#adjustedBudget').value);state.settings.reserve=Math.min(30,Math.max(15,Number($('#reserveBudget').value||20)));state.settings.useReserve=$('#useReserve').checked;recalcReportSuggestions();persist();$('#budgetDialog').close();renderAll();toast('Budget mis à jour')});
+$('#cancelBudget').addEventListener('click',()=>$('#budgetDialog').close());
+$('#productForm').addEventListener('submit',e=>{e.preventDefault();const id=$('#productId').value,level=Number($('#productLevel').value),now=new Date().toISOString();const p=normalizeProduct({id:id||uid('p'),nom:$('#productName').value.trim(),categorie:$('#productCategory').value.trim(),stock:$('#productStock').value,quantite:$('#productQuantity').value.trim(),frequence:$('#productFrequency').value.trim(),seuil:$('#productThreshold').value.trim(),canal:$('#productChannel').value.trim(),prix:Number($('#productPrice').value||0),dernierAchat:$('#productLastBuy').value,niveau:level,niveauLibelle:LEVEL_LABELS[level],souplesse:$('#productFlex').value,aAcheter:$('#productManualBuy').checked,createdAt:id?(state.products.find(x=>x.id===id)?.createdAt||''):now,updatedAt:now});if(id){const idx=state.products.findIndex(x=>x.id===id);state.products[idx]={...state.products[idx],...p}}else state.products.push(p);persist();$('#productDialog').close();renderAll();toast(id?'Produit modifié':'Produit ajouté')});
+$('#cancelProduct').addEventListener('click',()=>$('#productDialog').close());
+$('#itemForm').addEventListener('submit',e=>{e.preventDefault();const id=$('#itemProductId').value,i=state.session.items.find(x=>x.productId===id);i.quantity=$('#itemQuantity').value.trim();i.estimatedPrice=Number($('#itemPrice').value||0);i.actualPrice=i.estimatedPrice;i.decision='modified';recalcReportSuggestions();persist();$('#itemDialog').close();renderAll();toast('Proposition modifiée')});
+$('#cancelItem').addEventListener('click',()=>$('#itemDialog').close());
+$('#cancelClose').addEventListener('click',()=>$('#closeDialog').close());
+$('#closeForm').addEventListener('submit',e=>{e.preventDefault();const allItems=state.session.items.map(clone),selectedItems=allItems.filter(i=>['validated','modified'].includes(i.decision)),closedAt=new Date().toISOString(),totalActual=purchasedTotal();for(const i of selectedItems){const p=state.products.find(x=>x.id===i.productId);if(!p)continue;if(i.purchased&&!i.notFound){p.stock='Plein';p.aAcheter=false;p.dernierAchat=isoToday();p.prix=Number(i.actualPrice||p.prix);p.updatedAt=closedAt}else if(i.notFound){p.aAcheter=true}}state.history.push({id:state.session.id,month:state.settings.activeMonth,phase:state.session.phase,createdAt:state.session.createdAt,closedAt,budget:budgetValue(),reserve:protectedReserve(),totalEstimated:selectedItems.reduce((s,i)=>s+Number(i.estimatedPrice||0),0),totalActual,items:allItems});state.session=null;if($('#advancePhase').checked&&state.settings.currentPhase<4)state.settings.currentPhase+=1;persist();$('#closeDialog').close();setView('dashboard');toast('Inventaire clôturé')});
+$('#decisionFilters').addEventListener('click',e=>{const b=e.target.closest('[data-decision]');if(!b)return;decisionFilter=b.dataset.decision;$$('#decisionFilters .chip').forEach(x=>x.classList.toggle('active',x===b));renderPreparation()});
+$('#exportBtn').addEventListener('click',exportData);$('#importBtn').addEventListener('click',()=>$('#fileInput').click());
+$('#fileInput').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text()),incoming=d.state||d;if(!incoming||!Array.isArray(incoming.products))throw Error('invalid');if(confirm('Remplacer les données actuelles par cette sauvegarde DOROX ?')){state=migrateState(incoming);persist();renderAll();toast('Sauvegarde restaurée')}}catch(err){alert('Ce fichier de sauvegarde n’est pas valide.')}e.target.value=''});
+$('#resetBtn').addEventListener('click',()=>{if(confirm('Réinitialiser toute la V1 ? Les produits, le budget, le cycle en cours et l’historique seront remplacés.')){state=defaultState();persist();renderAll();toast('DOROX réinitialisé')}});
+
+document.addEventListener('click',e=>{
+  const jump=e.target.closest('[data-view-jump]');if(jump){setView(jump.dataset.viewJump);return}
+  const a=e.target.closest('[data-action]');if(!a)return;const id=a.dataset.id,action=a.dataset.action;
+  if(action==='edit-budget')openBudget();
+  if(action==='generate'){makeSession();setView('prepare')}
+  if(action==='regenerate'){if(confirm('Régénérer la liste effacera les arbitrages du cycle en cours. Continuer ?'))makeSession()}
+  if(action==='edit-product')openProduct(state.products.find(p=>p.id===id));
+  if(action==='toggle-manual'){const p=state.products.find(x=>x.id===id);p.aAcheter=!p.aAcheter;p.updatedAt=new Date().toISOString();persist();renderAll();toast('Inventaire mis à jour')}
+  if(action==='delete-product'){const p=state.products.find(x=>x.id===id);if(p&&confirm(`Supprimer « ${p.nom} » ?`)){state.products=state.products.filter(x=>x.id!==id);if(state.session)state.session.items=state.session.items.filter(x=>x.productId!==id);persist();renderAll();toast('Produit supprimé')}}
+  if(action==='decide'){const i=state.session.items.find(x=>x.productId===id);i.decision=a.dataset.value;i.purchased=false;i.notFound=false;recalcReportSuggestions();persist();renderAll();toast(decisionLabel(i.decision))}
+  if(action==='edit-item')openItem(id);
+  if(action==='why'){const w=$('#why-'+CSS.escape(id));w.hidden=!w.hidden;a.textContent=w.hidden?'Pourquoi ?':'Masquer'}
+  if(action==='not-found'){const i=state.session.items.find(x=>x.productId===id);i.notFound=!i.notFound;if(i.notFound)i.purchased=false;persist();renderShopping()}
+  if(action==='close-cycle')closeCycle();
+});
+document.addEventListener('change',e=>{const action=e.target.dataset.action,id=e.target.dataset.id;if(action==='purchase'){const i=state.session.items.find(x=>x.productId===id);i.purchased=e.target.checked;i.notFound=false;persist();renderShopping()}if(action==='actual-price'){const i=state.session.items.find(x=>x.productId===id);i.actualPrice=Number(e.target.value||0);persist();renderShopping()}});
+
+renderAll();
+</script>
+</body>
+</html>
